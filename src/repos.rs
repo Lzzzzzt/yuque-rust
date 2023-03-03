@@ -5,7 +5,7 @@ use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    gen_random_slug, judge_status_code, time_serde, User, Yuque, YuqueError, YuqueResponse,
+    gen_random_slug, judge_status_code, time_serde, User, Yuque, YuqueError, YuqueResponse, Toc, toc_serde,
 };
 
 /// id - 仓库编号
@@ -70,7 +70,8 @@ pub struct RepoDetail<'a> {
     pub user_id: i32,
     pub user: User<'a>,
     pub description: Option<Cow<'a, str>>,
-    pub toc_yml: Option<Cow<'a, str>>,
+    #[serde(with = "toc_serde")]
+    pub toc_yml: Option<Toc>,
     pub creator_id: i32,
     pub public: u8,
     pub items_count: i32,

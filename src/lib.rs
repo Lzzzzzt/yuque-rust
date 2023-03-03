@@ -128,3 +128,44 @@ impl Display for YuqueFormat {
         write!(f, "{s}")
     }
 }
+
+#[derive(Debug)]
+#[allow(unused)]
+pub struct Toc {
+    meta: TocMeta,
+    toc: Vec<TocItem>,
+}
+
+#[derive(Deserialize, Debug, Serialize)]
+#[allow(unused)]
+struct TocMeta {
+    #[serde(rename = "type")]
+    item_type: String,
+    count: u32,
+    display_level: u32,
+    tail_type: String,
+    base_version_id: u32,
+    published: bool,
+    max_level: u32,
+    last_updated_at: String,
+    version_id: u32,
+}
+
+#[derive(Deserialize, Debug, Serialize)]
+#[allow(unused)]
+struct TocItem {
+    #[serde(rename = "type")]
+    item_type: String,
+    title: String,
+    uuid: String,
+    url: String,
+    prev_uuid: String,
+    sibling_uuid: String,
+    child_uuid: String,
+    parent_uuid: String,
+    doc_id: u32,
+    level: u32,
+    id: u32,
+    open_window: u32,
+    visible: u32,
+}
