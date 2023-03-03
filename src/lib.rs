@@ -141,33 +141,33 @@ pub struct Toc<'a> {
 #[allow(unused)]
 pub struct TocMeta<'a> {
     #[serde(rename = "type")]
-    item_type: Cow<'a, str>,
-    count: u32,
-    display_level: u32,
-    tail_type: Cow<'a, str>,
-    base_version_id: u32,
-    published: bool,
-    max_level: u32,
+    pub item_type: Cow<'a, str>,
+    pub count: u32,
+    pub display_level: u32,
+    pub tail_type: Cow<'a, str>,
+    pub base_version_id: u32,
+    pub published: bool,
+    pub max_level: u32,
     #[serde(with = "time_serde")]
-    last_updated_at: DateTime<Local>,
-    version_id: u32,
+    pub last_updated_at: DateTime<Local>,
+    pub version_id: u32,
 }
 
 #[derive(Deserialize, Debug, Serialize)]
 #[allow(unused)]
 pub struct TocItem<'a> {
     #[serde(rename = "type")]
-    item_type: Cow<'a, str>,
-    title: Cow<'a, str>,
-    uuid: Cow<'a, str>,
-    url: Cow<'a, str>,
-    prev_uuid: Cow<'a, str>,
-    sibling_uuid: Cow<'a, str>,
-    child_uuid: Cow<'a, str>,
-    parent_uuid: Cow<'a, str>,
-    doc_id: u32,
-    level: u32,
-    id: u32,
-    open_window: u32,
-    visible: u32,
+    pub item_type: Cow<'a, str>,
+    pub title: Cow<'a, str>,
+    pub uuid: Cow<'a, str>,
+    pub url: Cow<'a, str>,
+    pub prev_uuid: Cow<'a, str>,
+    pub sibling_uuid: Cow<'a, str>,
+    pub child_uuid: Cow<'a, str>,
+    pub parent_uuid: Cow<'a, str>,
+    pub doc_id: u32,
+    pub level: u32,
+    pub id: u32,
+    pub open_window: u32,
+    pub visible: u32,
 }
