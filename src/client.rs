@@ -1,7 +1,7 @@
 use derive_builder::Builder;
 use reqwest::{header::HeaderMap, Client, RequestBuilder};
 
-use crate::{DocsClient, RequestMethod, YuqueError, DEFAULT_USER_AGENT};
+use crate::{DocsClient, ReposClient, RequestMethod, YuqueError, DEFAULT_USER_AGENT};
 
 /// The client of yuque.
 ///
@@ -266,6 +266,34 @@ impl Yuque {
     /// ```
     pub fn docs(&self) -> DocsClient {
         DocsClient {
+            client: self.clone(),
+        }
+    }
+    /// Get the client aimed to handle yuque repo.
+    ///
+    /// # Returns
+    ///
+    /// * `ReposClient` - The client aimed to handle yuque repo.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use yuque_rust::Yuque;
+    ///
+    /// let client = Yuque::builder()
+    ///                     .token("token")
+    ///                     .host("example_host")
+    ///                     .build()
+    ///                     .unwrap();
+    ///
+    /// let repos_client = client.repos();
+    ///
+    /// let response = repos_client.get("example").unwrap().send().await.unwrap();
+    ///
+    /// println!("{:#?}", response);
+    /// ```
+    pub fn repos(&self) -> ReposClient {
+        ReposClient {
             client: self.clone(),
         }
     }

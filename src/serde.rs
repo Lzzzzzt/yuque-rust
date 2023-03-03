@@ -1,4 +1,4 @@
-pub mod time_serde {
+pub(crate) mod time_serde {
     use chrono::{offset::Local as offset_local, DateTime, Local};
     use serde::{
         de::{self, Visitor},
@@ -49,7 +49,7 @@ pub mod time_serde {
     }
 }
 
-pub mod option_time_serde {
+pub(crate) mod option_time_serde {
     #![allow(unused)]
 
     use chrono::{offset::Local as offset_local, DateTime, Local};
@@ -117,7 +117,7 @@ pub mod option_time_serde {
     }
 }
 
-pub mod number_to_bool {
+pub(crate) mod number_to_bool {
     use serde::{de::Error, Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S: Serializer>(value: &bool, serializer: S) -> Result<S::Ok, S::Error> {

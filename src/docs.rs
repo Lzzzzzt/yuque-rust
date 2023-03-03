@@ -5,8 +5,8 @@ use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    gen_random_slug, judge_status_code, number_to_bool, option_time_serde, time_serde, Repo, User,
-    Yuque, YuqueError, YuqueFormat, YuqueResponse,
+    gen_random_slug, judge_status_code, number_to_bool, option_time_serde, time_serde,
+    RepoListItem, User, Yuque, YuqueError, YuqueFormat, YuqueResponse,
 };
 
 /// 文档列表项
@@ -44,7 +44,7 @@ pub struct DocListItem<'a> {
     pub comments_count: u16,
     #[serde(with = "time_serde")]
     pub content_updated_at: DateTime<Local>,
-    pub book: Option<Repo<'a>>,
+    pub book: Option<RepoListItem<'a>>,
     pub user: Option<User<'a>>,
     pub last_editor: User<'a>,
     #[serde(with = "time_serde")]
@@ -84,7 +84,7 @@ pub struct DocDetail<'a> {
     pub slug: Cow<'a, str>,
     pub title: Cow<'a, str>,
     pub book_id: i32,
-    pub book: Option<Repo<'a>>,
+    pub book: Option<RepoListItem<'a>>,
     pub user_id: i32,
     pub user: Option<User<'a>>,
     pub format: YuqueFormat,
@@ -184,7 +184,7 @@ impl DocsClient {
     /// 获取仓库下的文档列表
     ///
     /// # Arguments
-    /// * `namespace: impl Into<String>` - 仓库的命名空间
+    /// * `namespace: impl ToString` - 仓库的命名空间/id
     ///
     /// # Example
     /// ```rust
@@ -198,18 +198,18 @@ impl DocsClient {
     ///                         .host("https://www.yuque.com".to_string())
     ///                         .build()?;
     ///
-    ///     let docs = yuque.docs().list_by_namespace("your namespace").await?;
+    ///     let docs = yuque.docs().list_by_repo_namespace("your namespace").await?;
     ///
     ///     println!("{:?}", docs);
     ///     Ok(())
     /// }
     ///
     /// ```
-    pub async fn list_by_namespace(
+    pub async fn list_with_repo(
         &self,
-        namespace: impl Into<String>,
+        namespace: impl ToString,
     ) -> Result<YuqueResponse<Vec<DocListItem>>, YuqueError> {
-        let url = format!("/repos/{}/docs", namespace.into());
+        let url = format!("/repos/{}/docs", namespace.to_string());
 
         let response = self.client.get(&url)?.send().await?;
 
@@ -222,7 +222,7 @@ impl DocsClient {
     /// 获取文档详情
     ///
     /// # Arguments
-    /// * `namespace: impl Into<String>` - 仓库的命名空间
+    /// * `namespace: impl ToString` - 仓库的命名空间
     /// * `slug: impl Into<String>` - 文档的 Slug
     /// * `data: Option<Vec<(String, String)>>` - 查询参数
     ///
@@ -237,19 +237,19 @@ impl DocsClient {
     ///                         .host("https://www.yuque.com".to_string())
     ///                         .build()?;
     ///
-    ///     let doc = yuque.docs().get_by_slug("your namespace", "your slug", None).await?;
+    ///     let doc = yuque.docs().get_with_repo_ns("your namespace", "your slug", None).await?;
     ///
     ///     println!("{:?}", doc);
     ///     Ok(())
     /// }
     /// ```
-    pub async fn get_by_slug(
+    pub async fn get_with_repo_ns(
         &self,
-        namespace: impl Into<String>,
+        namespace: impl ToString,
         slug: impl Into<String>,
         data: Option<&[(&str, &str)]>,
     ) -> Result<YuqueResponse<DocDetail>, YuqueError> {
-        let url = format!("/repos/{}/docs/{}", namespace.into(), slug.into());
+        let url = format!("/repos/{}/docs/{}", namespace.to_string(), slug.into());
 
         let data = data.unwrap_or_default();
 
@@ -264,7 +264,7 @@ impl DocsClient {
     /// 创建文档
     ///
     /// # Arguments
-    /// * `namespace: impl Into<String>` - 仓库的命名空间
+    /// * `namespace: impl ToString` - 仓库的命名空间/id
     /// * `data: Option<Doc>` - 文档数据
     ///
     /// # Example
@@ -283,17 +283,17 @@ impl DocsClient {
     ///                     .body("body")
     ///                     .build();
     ///
-    ///     let doc = yuque.docs().create_by_namespace("your namespace", Some(doc)).await?;
+    ///     let doc = yuque.docs().create_with_repo("your namespace", Some(doc)).await?;
     ///
     ///     println!("{:?}", doc);
     ///     Ok(())
     /// }
-    pub async fn create_by_namespace(
+    pub async fn create_with_repo(
         &self,
-        namespace: impl Into<String>,
+        namespace: impl ToString,
         data: Doc,
     ) -> Result<YuqueResponse<DocDetail>, YuqueError> {
-        let url = format!("/repos/{}/docs", namespace.into());
+        let url = format!("/repos/{}/docs", namespace.to_string());
 
         let data = serde_json::to_string(&data).ok();
 
@@ -308,7 +308,7 @@ impl DocsClient {
     /// 删除文档
     ///
     /// # Arguments
-    /// * `namespace: impl Into<String>` - 仓库的命名空间
+    /// * `namespace: impl Into<String>` - 仓库的命名空间/id
     /// * `slug: impl Into<String>` - 文档的 Slug
     ///
     /// # Example
@@ -323,18 +323,18 @@ impl DocsClient {
     ///                         .host("https://www.yuque.com".to_string())
     ///                         .build()?;
     ///
-    ///     let doc = yuque.docs().delete_by_namespace("your namespace", "your slug").await?;
+    ///     let doc = yuque.docs().delete_with_repo("your namespace", "your slug").await?;
     ///
     ///     println!("{:?}", doc);
     ///     Ok(())
     /// }
     /// ```
-    pub async fn delete_by_doc_id(
+    pub async fn delete_with_repo(
         &self,
-        namespace: impl Into<String>,
+        namespace: impl ToString,
         id: i32,
     ) -> Result<YuqueResponse<DocDetail>, YuqueError> {
-        let url = format!("/repos/{}/docs/{}", namespace.into(), id);
+        let url = format!("/repos/{}/docs/{}", namespace.to_string(), id);
 
         let response = self.client.delete(&url)?.send().await?;
 
@@ -347,7 +347,7 @@ impl DocsClient {
     /// 更新文档
     ///
     /// # Arguments
-    /// * `namespace: impl Into<String>` - 仓库的命名空间
+    /// * `namespace: impl Into<String>` - 仓库的命名空间/id
     /// * `slug: impl Into<String>` - 文档的 Slug
     /// * `data: Option<Doc>` - 文档数据
     ///
@@ -367,14 +367,14 @@ impl DocsClient {
     ///                     .body("body")
     ///                     .build();
     ///
-    ///     let doc = yuque.docs().update_by_namespace("your namespace", "your slug", Some(doc)).await?;
+    ///     let doc = yuque.docs().update_with_repo("your namespace", "doc id", Some(doc)).await?;
     ///
     ///     println!("{:?}", doc);
     ///     Ok(())
     /// }
-    pub async fn update_by_doc_id(
+    pub async fn update_with_repo(
         &self,
-        namespace: impl Into<String>,
+        namespace: impl ToString,
         id: i32,
         data: Doc,
     ) -> Result<YuqueResponse<DocDetail>, YuqueError> {
@@ -383,7 +383,7 @@ impl DocsClient {
             _ => return Err(YuqueError::NotSupportFormat(data.format.into())),
         }
 
-        let url = format!("/repos/{}/docs/{}", namespace.into(), id);
+        let url = format!("/repos/{}/docs/{}", namespace.to_string(), id);
 
         let data = serde_json::to_string(&data).ok();
 
@@ -407,6 +407,9 @@ mod test {
         };
     }
 
+    const TEST_NS: &str = "lzzzt/sdk-test";
+    const TEST_HOST: &str = "https://lzzzt.yuque.com/api/v2";
+
     #[test]
     fn should_list_docs() -> Result<(), Box<dyn Error>> {
         dotenv::from_path(".env.dev").ok();
@@ -415,11 +418,11 @@ mod test {
 
         let client = Yuque::builder()
             .token(token)
-            .host("https://lzzzt.yuque.com/api/v2".into())
+            .host(TEST_HOST.into())
             .build()?
             .docs();
 
-        let docs = aw!(client.list_by_namespace("lzzzt/aekun3"))?;
+        let docs = aw!(client.list_with_repo(TEST_NS))?;
 
         assert!(docs.data.is_empty().not());
 
@@ -442,12 +445,12 @@ mod test {
 
         let client = Yuque::builder()
             .token(token)
-            .host("https://lzzzt.yuque.com/api/v2".into())
+            .host(TEST_HOST.into())
             .build()?
             .docs();
 
         let doc =
-            aw!(client.get_by_slug("lzzzt/aekun3", "create-by-sdk", Some(&[("raw", "1")])))?.data;
+            aw!(client.get_with_repo_ns(TEST_NS, "create-by-sdk", Some(&[("raw", "1")])))?.data;
 
         assert!(doc
             .body
@@ -464,7 +467,7 @@ mod test {
 
         let client = Yuque::builder()
             .token(token)
-            .host("https://lzzzt.yuque.com/api/v2".into())
+            .host(TEST_HOST.into())
             .build()?
             .docs();
 
@@ -474,13 +477,13 @@ mod test {
             .slug("by-sdk".into())
             .build()?;
 
-        let created_doc = aw!(client.create_by_namespace("lzzzt/aekun3", doc.clone()))?.data;
+        let created_doc = aw!(client.create_with_repo(TEST_NS, doc.clone()))?.data;
 
         assert_eq!(doc.title, created_doc.title);
         assert!(created_doc.body.contains(doc.body.as_str()));
         assert_eq!(doc.slug, created_doc.slug);
 
-        let deleted_doc = aw!(client.delete_by_doc_id("lzzzt/aekun3", created_doc.id))?.data;
+        let deleted_doc = aw!(client.delete_with_repo(TEST_NS, created_doc.id))?.data;
 
         assert_eq!(doc.title, deleted_doc.title);
 
@@ -495,12 +498,12 @@ mod test {
 
         let client = Yuque::builder()
             .token(token)
-            .host("https://lzzzt.yuque.com/api/v2".into())
+            .host(TEST_HOST.into())
             .build()?
             .docs();
 
         let (mut doc, id): (Doc, i32) =
-            aw!(client.get_by_slug("lzzzt/aekun3", "create-by-sdk", Some(&[("raw", "1")])))?
+            aw!(client.get_with_repo_ns(TEST_NS, "create-by-sdk", Some(&[("raw", "1")])))?
                 .data
                 .try_into()?;
 
@@ -508,7 +511,7 @@ mod test {
 
         doc.body = new_body.clone();
 
-        let updated_doc = aw!(client.update_by_doc_id("lzzzt/aekun3", id, doc))?.data;
+        let updated_doc = aw!(client.update_with_repo(TEST_NS, id, doc))?.data;
 
         assert_eq!(updated_doc.body, new_body);
 
