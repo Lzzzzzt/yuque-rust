@@ -132,13 +132,13 @@ impl Display for YuqueFormat {
 #[derive(Debug)]
 #[allow(unused)]
 pub struct Toc {
-    meta: TocMeta,
-    toc: Vec<TocItem>,
+    pub meta: TocMeta,
+    pub toc: Vec<TocItem>,
 }
 
 #[derive(Deserialize, Debug, Serialize)]
 #[allow(unused)]
-struct TocMeta {
+pub struct TocMeta {
     #[serde(rename = "type")]
     item_type: String,
     count: u32,
@@ -153,7 +153,7 @@ struct TocMeta {
 
 #[derive(Deserialize, Debug, Serialize)]
 #[allow(unused)]
-struct TocItem {
+pub struct TocItem {
     #[serde(rename = "type")]
     item_type: String,
     title: String,
