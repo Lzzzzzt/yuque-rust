@@ -143,32 +143,31 @@ pub(crate) mod number_to_bool {
 pub(crate) mod toc_serde {
     use serde::{
         de::{self, Visitor},
-        Deserializer, Serializer,
+        Deserializer,
     };
-    use serde_yaml::to_string;
 
     use crate::{Toc, TocItem, TocMeta};
 
-    #[allow(unused)]
-    pub fn serialize<S: Serializer>(value: Option<Toc>, serializer: S) -> Result<S::Ok, S::Error> {
-        if let Some(value) = value {
-            let Toc { meta, toc } = value;
+    // #[allow(unused)]
+    // pub fn serialize<S: Serializer>(value: Option<Toc>, serializer: S) -> Result<S::Ok, S::Error> {
+    //     if let Some(value) = value {
+    //         let Toc { meta, toc } = value;
 
-            let meta = vec![meta];
-            let meta = to_string(&meta).map_err(|e| serde::ser::Error::custom(e.to_string()))?;
-            let toc = to_string(&toc).map_err(|e| serde::ser::Error::custom(e.to_string()))?;
+    //         let meta = vec![meta];
+    //         let meta = to_string(&meta).map_err(|e| serde::ser::Error::custom(e.to_string()))?;
+    //         let toc = to_string(&toc).map_err(|e| serde::ser::Error::custom(e.to_string()))?;
 
-            let result = vec![meta, toc].join("\n");
+    //         let result = vec![meta, toc].join("\n");
 
-            serializer.serialize_str(&result)
-        } else {
-            serializer.serialize_none()
-        }
-    }
+    //         serializer.serialize_str(&result)
+    //     } else {
+    //         serializer.serialize_none()
+    //     }
+    // }
 
-    pub fn deserialize<'de, D: Deserializer<'de>>(
+    pub fn deserialize<'de, 'a, D: Deserializer<'de>>(
         deserializer: D,
-    ) -> Result<Option<Toc>, D::Error> {
+    ) -> Result<Option<Toc<'a>>, D::Error> {
         let value: String = deserializer.deserialize_string(StrVisitor)?.unwrap();
 
         let meta = value

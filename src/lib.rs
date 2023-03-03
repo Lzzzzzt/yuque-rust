@@ -1,6 +1,7 @@
-use std::fmt::Display;
+use std::{borrow::Cow, fmt::Display};
 
 use ::serde::{Deserialize, Serialize};
+use chrono::{DateTime, Local};
 use rand::Rng;
 use reqwest::Method;
 
@@ -131,38 +132,39 @@ impl Display for YuqueFormat {
 
 #[derive(Debug)]
 #[allow(unused)]
-pub struct Toc {
-    pub meta: TocMeta,
-    pub toc: Vec<TocItem>,
+pub struct Toc<'a> {
+    pub meta: TocMeta<'a>,
+    pub toc: Vec<TocItem<'a>>,
 }
 
-#[derive(Deserialize, Debug, Serialize)]
+#[derive(Deserialize, Debug)]
 #[allow(unused)]
-pub struct TocMeta {
+pub struct TocMeta<'a> {
     #[serde(rename = "type")]
-    item_type: String,
+    item_type: Cow<'a, str>,
     count: u32,
     display_level: u32,
-    tail_type: String,
+    tail_type: Cow<'a, str>,
     base_version_id: u32,
     published: bool,
     max_level: u32,
-    last_updated_at: String,
+    #[serde(with = "time_serde")]
+    last_updated_at: DateTime<Local>,
     version_id: u32,
 }
 
 #[derive(Deserialize, Debug, Serialize)]
 #[allow(unused)]
-pub struct TocItem {
+pub struct TocItem<'a> {
     #[serde(rename = "type")]
-    item_type: String,
-    title: String,
-    uuid: String,
-    url: String,
-    prev_uuid: String,
-    sibling_uuid: String,
-    child_uuid: String,
-    parent_uuid: String,
+    item_type: Cow<'a, str>,
+    title: Cow<'a, str>,
+    uuid: Cow<'a, str>,
+    url: Cow<'a, str>,
+    prev_uuid: Cow<'a, str>,
+    sibling_uuid: Cow<'a, str>,
+    child_uuid: Cow<'a, str>,
+    parent_uuid: Cow<'a, str>,
     doc_id: u32,
     level: u32,
     id: u32,

@@ -72,7 +72,7 @@ pub struct RepoDetail<'a> {
     pub user: User<'a>,
     pub description: Option<Cow<'a, str>>,
     #[serde(with = "toc_serde", rename = "toc_yml")]
-    pub toc: Option<Toc>,
+    pub toc: Option<Toc<'a>>,
     pub creator_id: i32,
     pub public: u8,
     pub items_count: i32,
