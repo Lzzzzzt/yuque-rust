@@ -12,7 +12,7 @@ mod repos;
 mod response;
 mod serde;
 mod user;
-pub use crate::serde::*;
+use crate::serde::*;
 pub use client::*;
 pub use docs::*;
 pub use error::*;
