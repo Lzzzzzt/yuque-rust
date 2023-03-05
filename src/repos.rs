@@ -5,7 +5,7 @@ use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    gen_random_slug, judge_status_code, time_serde, toc_serde, Toc, User, Yuque, YuqueError,
+    gen_random_slug, judge_status_code, serde::toc_serde, time_serde, Toc, User, Yuque, YuqueError,
     YuqueResponse,
 };
 
@@ -71,8 +71,8 @@ pub struct RepoDetail<'a> {
     pub user_id: i32,
     pub user: User<'a>,
     pub description: Option<Cow<'a, str>>,
-    #[serde(with = "toc_serde", rename = "toc_yml")]
-    pub toc: Option<Toc<'a>>,
+    #[serde(rename = "toc_yml", with = "toc_serde")]
+    pub toc: Option<Vec<Toc<'a>>>,
     pub creator_id: i32,
     pub public: u8,
     pub items_count: i32,
@@ -334,6 +334,9 @@ impl ReposClient {
 
         judge_status_code(response.status().as_u16(), url)?;
 
+        // let text = dbg!(response.text().await.unwrap());
+
+        // Ok(serde_json::from_str(&text).unwrap())
         Ok(response.json().await?)
     }
 

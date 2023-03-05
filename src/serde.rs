@@ -146,7 +146,7 @@ pub(crate) mod toc_serde {
         Deserializer,
     };
 
-    use crate::{Toc, TocItem, TocMeta};
+    use crate::Toc;
 
     // #[allow(unused)]
     // pub fn serialize<S: Serializer>(value: Option<Toc>, serializer: S) -> Result<S::Ok, S::Error> {
@@ -167,29 +167,31 @@ pub(crate) mod toc_serde {
 
     pub fn deserialize<'de, 'a, D: Deserializer<'de>>(
         deserializer: D,
-    ) -> Result<Option<Toc<'a>>, D::Error> {
+    ) -> Result<Option<Vec<Toc<'a>>>, D::Error> {
         let value: String = deserializer.deserialize_string(StrVisitor)?.unwrap();
 
-        let meta = value
-            .lines()
-            .take(9)
-            .map(|s| format!("{}\n", s))
-            .collect::<String>();
-        let toc = value
-            .lines()
-            .skip(9)
-            .map(|s| format!("{}\n", s))
-            .collect::<String>();
+        Ok(serde_yaml::from_str(&value).unwrap())
 
-        let meta = serde_yaml::from_str::<Vec<TocMeta>>(&meta)
-            .map_err(|e| de::Error::custom(e.to_string()))?
-            .pop()
-            .expect("Can not fine Metadata.");
+        // let meta = value
+        //     .lines()
+        //     .take(9)
+        //     .map(|s| format!("{}\n", s))
+        //     .collect::<String>();
+        // let toc = value
+        //     .lines()
+        //     .skip(9)
+        //     .map(|s| format!("{}\n", s))
+        //     .collect::<String>();
 
-        let toc = serde_yaml::from_str::<Vec<TocItem>>(&toc)
-            .map_err(|e| de::Error::custom(e.to_string()))?;
+        // let meta = serde_yaml::from_str::<Vec<TocMeta>>(&meta)
+        //     .map_err(|e| de::Error::custom(e.to_string()))?
+        //     .pop()
+        //     .expect("Can not fine Metadata.");
 
-        Ok(Some(Toc { meta, toc }))
+        // let toc = serde_yaml::from_str::<Vec<TocDocItem>>(&toc)
+        //     .map_err(|e| de::Error::custom(e.to_string()))?;
+
+        // Ok(Some(Toc { meta, toc }))
     }
 
     struct StrVisitor;

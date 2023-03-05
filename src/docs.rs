@@ -223,7 +223,7 @@ impl DocsClient {
     ///
     /// # Arguments
     /// * `namespace: impl ToString` - 仓库的命名空间
-    /// * `slug: impl Into<String>` - 文档的 Slug
+    /// * `slug: impl ToString` - 文档的 Slug
     /// * `data: Option<Vec<(String, String)>>` - 查询参数
     ///
     /// # Example
@@ -246,10 +246,10 @@ impl DocsClient {
     pub async fn get_with_repo_ns(
         &self,
         namespace: impl ToString,
-        slug: impl Into<String>,
+        slug: impl ToString,
         data: Option<&[(&str, &str)]>,
     ) -> Result<YuqueResponse<DocDetail>, YuqueError> {
-        let url = format!("/repos/{}/docs/{}", namespace.to_string(), slug.into());
+        let url = format!("/repos/{}/docs/{}", namespace.to_string(), slug.to_string());
 
         let data = data.unwrap_or_default();
 

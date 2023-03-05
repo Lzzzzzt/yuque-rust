@@ -130,18 +130,21 @@ impl Display for YuqueFormat {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 #[allow(unused)]
-pub struct Toc<'a> {
-    pub meta: TocMeta<'a>,
-    pub toc: Vec<TocItem<'a>>,
+#[serde(tag = "type")]
+pub enum Toc<'a> {
+    #[serde(rename = "META")]
+    Meta(TocMeta<'a>),
+    #[serde(rename = "DOC")]
+    Doc(TocDocItem<'a>),
+    #[serde(rename = "TITLE")]
+    Title(TocTitleItem<'a>),
 }
 
 #[derive(Deserialize, Debug)]
 #[allow(unused)]
 pub struct TocMeta<'a> {
-    #[serde(rename = "type")]
-    pub item_type: Cow<'a, str>,
     pub count: u32,
     pub display_level: u32,
     pub tail_type: Cow<'a, str>,
@@ -155,9 +158,7 @@ pub struct TocMeta<'a> {
 
 #[derive(Deserialize, Debug, Serialize)]
 #[allow(unused)]
-pub struct TocItem<'a> {
-    #[serde(rename = "type")]
-    pub item_type: Cow<'a, str>,
+pub struct TocDocItem<'a> {
     pub title: Cow<'a, str>,
     pub uuid: Cow<'a, str>,
     pub url: Cow<'a, str>,
@@ -168,6 +169,22 @@ pub struct TocItem<'a> {
     pub doc_id: u32,
     pub level: u32,
     pub id: u32,
+    pub open_window: u32,
+    pub visible: u32,
+}
+
+#[derive(Deserialize, Debug, Serialize)]
+pub struct TocTitleItem<'a> {
+    pub title: Cow<'a, str>,
+    pub uuid: Cow<'a, str>,
+    pub url: Cow<'a, str>,
+    pub prev_uuid: Cow<'a, str>,
+    pub sibling_uuid: Cow<'a, str>,
+    pub child_uuid: Cow<'a, str>,
+    pub parent_uuid: Cow<'a, str>,
+    pub doc_id: Cow<'a, str>,
+    pub level: u32,
+    pub id: Cow<'a, str>,
     pub open_window: u32,
     pub visible: u32,
 }
