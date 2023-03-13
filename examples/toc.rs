@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let repo = client.repos();
 
-    let a = repo.get("lzzzt/ssg", None).await?.data.toc;
+    let a = repo.get("lzzzt/backend", None).await?.data.toc;
 
     println!("{:#?}", a);
 
