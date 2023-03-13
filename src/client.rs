@@ -22,7 +22,7 @@ pub struct Yuque {
     #[builder(default = "Client::default()")]
     pub(crate) client: Client,
     pub(crate) token: String,
-    pub(crate) host: String,
+    pub host: String,
     #[builder(default = "DEFAULT_USER_AGENT.into()")]
     pub(crate) user_agent: String,
 }
