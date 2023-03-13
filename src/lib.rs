@@ -146,7 +146,7 @@ pub enum Toc<'a> {
 #[allow(unused)]
 pub struct TocMeta<'a> {
     pub count: u32,
-    pub display_level: u32,
+    pub display_level: Cow<'a, str>,
     pub tail_type: Cow<'a, str>,
     pub base_version_id: u32,
     pub published: bool,
